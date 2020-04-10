@@ -101,6 +101,7 @@ const onSubmit = (event) => {
     const selectInputs = allInputs.filter(input => input.type === 'select');
     const selectElements = findSelectElements(formElement);
     const radioButtons = allInputs.filter(input => input.type === 'radio' && input.checked);
+    const phoneInputs = allInputs.filter(input => input.type === 'tel');
 
     const inputsToSend = [
         ...textInputs,
@@ -108,6 +109,7 @@ const onSubmit = (event) => {
         ...selectInputs,
         ...selectElements,
         ...radioButtons,
+        ...phoneInputs,
     ].filter(input => input.name && input.value);
 
     const formData = new FormData();
