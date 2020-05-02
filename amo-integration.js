@@ -218,17 +218,23 @@ class InputElementsProcessor {
     ].filter(input => input.name && input.value);
   }
 
-  static findSubmitButton = formElement => Array.from(
-    formElement.querySelectorAll('input[type="submit"]'),
-  );
+  static findSubmitButton(formElement) {
+    return Array.from(
+      formElement.querySelectorAll('input[type="submit"]'),
+    );
+  }
 
-  static findInputElements = formElement => Array.from(
-    formElement.querySelectorAll('input'),
-  );
+  static findInputElements(formElement) {
+    return Array.from(
+      formElement.querySelectorAll('input'),
+    );
+  }
 
-  static findSelectElements = formElement => Array.from(
-    formElement.querySelectorAll('select'),
-  );
+  static findSelectElements(formElement) {
+    return Array.from(
+      formElement.querySelectorAll('select'),
+    );
+  }
 
   static filterTextInputElements(inputElements) {
     return inputElements.filter(input => input.type === 'text');
@@ -256,10 +262,12 @@ class InputElementsProcessor {
       .every(input => input.value);
   }
 
-  static findIframeDocuments = () => Array
-    .from(document.querySelectorAll('iframe'))
-    .map(iframe => iframe.contentDocument)
-    .filter(Boolean);
+  static findIframeDocuments() {
+    return Array
+      .from(document.querySelectorAll('iframe'))
+      .map(iframe => iframe.contentDocument)
+      .filter(Boolean);
+  }
 }
 
 class FormScraper {
@@ -329,7 +337,7 @@ class FormScraper {
    * @returns {void}
    * @private
    */
-  onSubmit = (event) => {
+  onSubmit(event) {
     const formElement = event.target;
 
     if (!InputElementsProcessor.isRequiredInputsValid(formElement)) {
@@ -343,10 +351,11 @@ class FormScraper {
     const leadName = `Заявка с сайта ${siteName}`;
     const tags = ['заявка', siteName];
     const info = [siteName, phone].join('\n');
-    const amoLead = new AmoLead(leadName, siteName, tags, info, phone, siteName, noteContent);
+    const contactName = 'Новый контакт';
+    const amoLead = new AmoLead(leadName, contactName, tags, info, phone, siteName, noteContent);
 
     this.sendLead(amoLead);
-  };
+  }
 
   /**
    * Send amo lead to server
@@ -376,29 +385,31 @@ class FormScraper {
    * @returns {void}
    * @private
    */
-  subscribeOnSubmit = (documentElement) => {
+  subscribeOnSubmit(documentElement) {
     if (this._registeredDocuments.includes(documentElement)) {
       return;
     }
 
     this._registeredDocuments.push(documentElement);
-    documentElement.addEventListener('submit', this.onSubmit, true);
-  };
+    documentElement.addEventListener('submit', this.onSubmit.bind(this), true);
+  }
 
   /**
    * Find all new documents and subscribe on it's submit events
    * @returns {void}
    * @private
    */
-  handleNewDocuments = () => InputElementsProcessor.findIframeDocuments()
-    .forEach(this.subscribeOnSubmit);
+  handleNewDocuments() {
+    return InputElementsProcessor.findIframeDocuments()
+      .forEach(this.subscribeOnSubmit.bind(this));
+  }
 
   /**
    * Start documents and events processing
    * @returns {void}
    */
   startScraping() {
-    setInterval(this.handleNewDocuments, 500);
+    setInterval(this.handleNewDocuments.bind(this), 500);
     this.subscribeOnSubmit(document);
   }
 }
